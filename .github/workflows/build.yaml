@@ -63,6 +63,9 @@ jobs:
   publish: # Reference publish.yaml workflow
     uses: ./.github/workflows/publish.yaml
     secrets: inherit # pass all secrets
+    with:
+      PLATFORMS: ${{ needs.build.outputs.PLATFORMS }}
+      GIT_SHA: ${{ needs.build.outputs.GIT_SHA }}
     # needs: [build] # This job depends on the successful completion of "build"
     # uses: ./.github/workflows/publish.yaml
     # with:
