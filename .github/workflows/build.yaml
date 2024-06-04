@@ -19,8 +19,8 @@ jobs:
         platform: [amd64, arm64]
 
     outputs:
-      PLATFORMS: ${{ steps.build.outputs.PLATFORMS }}
-      GIT_SHA: ${{ steps.build.outputs.GIT_SHA }}
+      platforms: ${{ matrix.platform }}
+      git_sha: ${{ steps.git_sha.outputs.SHA }}
 
     steps:
       - name: Checkout Repository
@@ -65,8 +65,8 @@ jobs:
     uses: ./.github/workflows/publish.yaml
     secrets: inherit # pass all secrets
     with:
-      PLATFORMS: ${{ needs.build.outputs.PLATFORMS }}
-      GIT_SHA: ${{ needs.build.outputs.GIT_SHA }}
+      platforms: ${{ jobs.build.outputs.platforms }}
+      git_sha: ${{ jobs.build.outputs.git_sha }}
     # uses: ./.github/workflows/publish.yaml
     # with:
     #   PLATFORMS: ${{ needs.build.outputs.PLATFORMS }}

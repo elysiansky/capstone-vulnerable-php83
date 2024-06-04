@@ -3,18 +3,17 @@ name: Publish Docker Images
 on:
   workflow_call:
     inputs:
-      PLATFORMS:
+      git_sha:
+        description: 'git hash commit'
         required: true
         type: string
-      GIT_SHA:
+      platform:
+        description: 'Architecture builds arm64 or amd64(x86)'
         required: true
         type: string
-    outputs:
-      PUBLISH_STATUS:
-        value: ${{ jobs.publish.outputs.PUBLISH_STATUS }}
 
 jobs:
-  publish:
+  docker-images:
     runs-on: ubuntu-latest
     environment: development
 
@@ -34,7 +33,7 @@ jobs:
           context: .
           file: ./docker/nginx/Dockerfile
           platforms: ${{ inputs.PLATFORMS }}  # Get platforms from build job output
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-nginx:${{ inputs.GIT_SHA }}-${{ inputs.PLATFORMS }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-nginx:${{ inputs.git_sha }}-${{ inputs.platforms }}
           push: true  # Enable push for this job
 
       - name: Publish Docker Image (PHP83)
@@ -43,5 +42,5 @@ jobs:
           context: .
           file: ./docker/php83/Dockerfile
           platforms: ${{ inputs.PLATFORMS }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ inputs.GIT_SHA }}-${{ inputs.PLATFORMS }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
           push: true  # Enable push for this job
