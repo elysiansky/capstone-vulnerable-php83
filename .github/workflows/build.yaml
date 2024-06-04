@@ -61,9 +61,10 @@ jobs:
           tags: capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
 
   publish: # Reference publish.yaml workflow
-    name: Publish Docker Images
-    needs: [build] # This job depends on the successful completion of "build"
     uses: ./.github/workflows/publish.yaml
-    with:
-      PLATFORMS: ${{ needs.build.outputs.PLATFORMS }}
-      GIT_SHA: ${{ needs.build.outputs.GIT_SHA }}
+    secrets: inherit # pass all secrets
+    # needs: [build] # This job depends on the successful completion of "build"
+    # uses: ./.github/workflows/publish.yaml
+    # with:
+    #   PLATFORMS: ${{ needs.build.outputs.PLATFORMS }}
+    #   GIT_SHA: ${{ needs.build.outputs.GIT_SHA }}
