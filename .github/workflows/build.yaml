@@ -63,8 +63,15 @@ jobs:
   publish: # Reference publish.yaml workflow
     name: Publish Docker Images
     needs: [build] # This job depends on the successful completion of "build"
-    uses: ./.github/workflows/publish.yaml
+    uses: actions/github-script@v4
     with:
-      PLATFORMS: ${{ needs.build.outputs.ENVIRONMENT }}
-      GIT_SHA: ${{ needs.set-env-vars.outputs.ECR_REPO_NAME }}
-    secrets: inherit
+      script: |
+        const { exec } = require('child_process');
+
+        // Run the external workflow passing PLATFORMS and GIT_SHA as environment variables
+        exec('echo "PLATFORMS=${{ needs.build.outputs.PLATFORMS }}\nGIT_SHA=${{ needs.build.outputs.GIT_SHA }}" | gh workflow run -R owner/repo-name publish.yaml -');
+
+      # Make sure to replace `owner/repo-name` with the actual owner and repository name where publish.yaml is located
+    secrets: # Inherit secrets from the parent workflow
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
