@@ -7,6 +7,10 @@ on:
       - development
 
 jobs:
+  # Empty job to satisfy workflow requirement
+  dummy:
+    runs-on: ubuntu-latest
+    needs: []  # No dependencies
   publish:
     runs-on: ubuntu-latest
     environment: development
