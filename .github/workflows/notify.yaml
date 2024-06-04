@@ -1,20 +1,32 @@
-name: Notify Build Status
+# name: Notify Build Status
 
-on:
-  push:
-    branches:
-      - main
-  workflow_run:
-    workflows: ["Build Docker Images", "Publish Docker Images"]
-    types:
-      - completed
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_run:
+#     workflows: ["Build Docker Images", "Publish Docker Images"]
+#     types:
+#       - completed
 
-jobs:
-  notify:
-    runs-on: ubuntu-latest
+# jobs:
+#   notify:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
 
-      # Add notification steps here
+#       - name: Send Discord notification on success
+#         if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#         uses: Ilshidur/action-discord@master
+#         with:
+#           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+#           content: 'Build and Publish: Success'
+
+#       - name: Send Discord notification on failure
+#         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+#         uses: Ilshidur/action-discord@master
+#         with:
+#           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+#           content: 'Build and Publish: Failure'
