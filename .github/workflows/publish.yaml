@@ -1,18 +1,77 @@
-name: Publish Docker Images (Reusable)
+name: Publish Docker Images
+
+on:
+  workflow_run:
+    workflows: ["Build Docker Images"]
+    types:
+      - completed
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  HELM_CHART_PERSONAL_ACCESS_TOKEN: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Login to DockerHub
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Download Nginx Image Digest
+        uses: actions/download-artifact@v2
+        with:
+          name: nginx-image-digest
+          path: ./docker/nginx
+
+      - name: Download PHP83 Image Digest
+        uses: actions/download-artifact@v2
+        with:
+          name: php83-image-digest
+          path: ./docker/php83
+
+      - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build and Push Docker Image
+      - name: Push Docker Images (Nginx)
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ${{ inputs.dockerfile_path }}
-          platforms: ${{ inputs.platforms }}
+          context: ./docker/nginx
+          file: ./docker/nginx/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/{{ inputs.image_name }}:${{ github.sha }}-${{ inputs.platforms }}
+            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:latest
+            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.sha }}
+
+      - name: Push Docker Images (PHP83)
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker/php83
+          file: ./docker/php83/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:latest
+            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.sha }}
+
+      # - name: Checkout Helm Chart Repository
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: yourusername/helmchart-repo
+      #     token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
+      #     path: helmchart
+
+      # - name: Update Helm Chart Image Tag
+      #   run: |
+      #     sed -i 's/tag:.*/tag: ${{ github.sha }}/' helmchart/path/to/your/values.yaml
+
+      # - name: Commit and Push Changes
+      #   run: |
+      #     cd helmchart
+      #     git config --global user.email "you@example.com"
+      #     git config --global user.name "Your Name"
+      #     git add .
+      #     git commit -m "Update image tag to ${{ github.sha }}"
+      #     git push origin main

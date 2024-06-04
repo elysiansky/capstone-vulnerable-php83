@@ -4,16 +4,14 @@ on:
   push:
     branches:
       - main
-      - development
 
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  HELM_CHART_PERSONAL_ACCESS_TOKEN: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }} (Optional, if needed in build)
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: development
     strategy:
       matrix:
         platform: [amd64, arm64]
@@ -22,10 +20,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up QEMU (Optional, needed for multi-arch builds)
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
-      - name: Set up Docker Buildx (Optional, needed for multi-arch builds)
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
       - name: Get Git commit SHA
@@ -33,15 +31,37 @@ jobs:
         run: echo "::set-output name=SHA::$(git rev-parse --short HEAD)"
 
       - name: Build Docker Images (Nginx)
-        uses: ./publish.yaml # Reference the publish workflow
+        id: build_nginx
+        uses: docker/build-push-action@v2
         with:
-          image_name: capstone-vulnerable-nginx
-          dockerfile_path: ./docker/nginx/Dockerfile
+          context: ./docker/nginx
+          file: ./docker/nginx/Dockerfile
           platforms: ${{ matrix.platform }}
+          push: false
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
 
       - name: Build Docker Images (PHP83)
-        uses: ./publish.yaml # Reference the publish workflow
+        id: build_php83
+        uses: docker/build-push-action@v2
         with:
-          image_name: capstone-vulnerable-php83
-          dockerfile_path: ./docker/php83/Dockerfile
+          context: ./docker/php83
+          file: ./docker/php83/Dockerfile
           platforms: ${{ matrix.platform }}
+          push: false
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
+
+      - name: Upload Nginx Image Digest
+        uses: actions/upload-artifact@v2
+        with:
+          name: nginx-image-digest
+          path: |
+            ${{ github.workspace }}/docker/nginx/nginx-image-${{ matrix.platform }}.tar
+
+      - name: Upload PHP83 Image Digest
+        uses: actions/upload-artifact@v2
+        with:
+          name: php83-image-digest
+          path: |
+            ${{ github.workspace }}/docker/php83/php83-image-${{ matrix.platform }}.tar
