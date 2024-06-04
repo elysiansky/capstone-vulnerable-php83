@@ -10,7 +10,6 @@ on:
     types:
       - completed
 
-
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -50,26 +49,25 @@ jobs:
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Load and Push Docker Image (Nginx amd64)
-  run: |
-    gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
-    docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
-    docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
+        run: |
+          gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
+          docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
 
-- name: Load and Push Docker Image (Nginx arm64)
-  run: |
-    gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
-    docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
-    docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
+      - name: Load and Push Docker Image (Nginx arm64)
+        run: |
+          gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
+          docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
 
-- name: Load and Push Docker Image (PHP83 amd64)
-  run: |
-    gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
-    docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
-    docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
+      - name: Load and Push Docker Image (PHP83 amd64)
+        run: |
+          gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
+          docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
 
-- name: Load and Push Docker Image (PHP83 arm64)
-  run: |
-    gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
-    docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
-    docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
-
+      - name: Load and Push Docker Image (PHP83 arm64)
+        run: |
+          gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
+          docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
