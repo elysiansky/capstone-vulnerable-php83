@@ -38,7 +38,7 @@ jobs:
       - name: Build Docker Image (Nginx)
         id: build_nginx
         run: |
-          docker buildx build --platform ${{ matrix.platform }} --output type=docker --tag capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} -f ./docker/nginx/Dockerfile ./docker/nginx
+          docker buildx build --platform ${{ matrix.platform }} --output type=docker --tag capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} -f ./docker/nginx/Dockerfile .
           docker save capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} | gzip > capstone-vulnerable-nginx_${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}.tar.gz
 
       - name: Upload Nginx Docker Image Artifact
@@ -50,7 +50,7 @@ jobs:
       - name: Build Docker Image (PHP83)
         id: build_php83
         run: |
-          docker buildx build --platform ${{ matrix.platform }} --output type=docker --tag capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} -f ./docker/php83/Dockerfile ./docker/php83
+          docker buildx build --platform ${{ matrix.platform }} --output type=docker --tag capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} -f ./docker/php83/Dockerfile .
           docker save capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} | gzip > capstone-vulnerable-php83_${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}.tar.gz
 
       - name: Upload PHP83 Docker Image Artifact
