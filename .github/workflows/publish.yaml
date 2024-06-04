@@ -5,70 +5,37 @@ on:
     branches:
       - main
       - development
-  workflow_run:
-    workflows: ["Build Docker Images"]
-    types:
-      - completed
-
-env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  HELM_CHART_PERSONAL_ACCESS_TOKEN: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    needs: build
+    environment: development
+    needs: build  # This job depends on the successful completion of the "build" job in build.yaml
 
     steps:
-      - name: Download Nginx Docker Image Artifact (amd64)
-        uses: actions/download-artifact@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
-          name: capstone-vulnerable-nginx-${{ github.event.workflow_run.head_commit.id }}-amd64
-          path: .
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Download Nginx Docker Image Artifact (arm64)
-        uses: actions/download-artifact@v2
+      - name: Publish Docker Image (Nginx)
+        uses: docker/build-push-action@v2
         with:
-          name: capstone-vulnerable-nginx-${{ github.event.workflow_run.head_commit.id }}-arm64
-          path: .
+          context: .
+          file: ./docker/nginx/Dockerfile
+          platforms: ${{ needs.build.outputs.PLATFORMS }}  # Get platforms from build job output
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-nginx:${{ needs.build.outputs.GIT_SHA }}-${{ needs.build.outputs.PLATFORMS }}
+          push: true  # Enable push for this job
 
-      - name: Download PHP83 Docker Image Artifact (amd64)
-        uses: actions/download-artifact@v2
+      - name: Publish Docker Image (PHP83)
+        uses: docker/build-push-action@v2
         with:
-          name: capstone-vulnerable-php83-${{ github.event.workflow_run.head_commit.id }}-amd64
-          path: .
-
-      - name: Download PHP83 Docker Image Artifact (arm64)
-        uses: actions/download-artifact@v2
-        with:
-          name: capstone-vulnerable-php83-${{ github.event.workflow_run.head_commit.id }}-arm64
-          path: .
-
-      - name: Log in to DockerHub
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Load and Push Docker Image (Nginx amd64)
-        run: |
-          gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
-          docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
-          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
-
-      - name: Load and Push Docker Image (Nginx arm64)
-        run: |
-          gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
-          docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
-          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
-
-      - name: Load and Push Docker Image (PHP83 amd64)
-        run: |
-          gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
-          docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
-          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
-
-      - name: Load and Push Docker Image (PHP83 arm64)
-        run: |
-          gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
-          docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
-          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
+          context: .
+          file: ./docker/php83/Dockerfile
+          platforms: ${{ needs.build.outputs.PLATFORMS }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ needs.build.outputs.SHA }}-${{ needs.build.outputs.PLATFORMS }}
+          push: true  # Enable push for this job
