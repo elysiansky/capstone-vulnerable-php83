@@ -1,3 +1,6 @@
+Certainly! Here's the updated `publish.yaml` with the correct artifact names including the commit SHA:
+
+```yaml
 name: Publish Docker Images
 
 on:
@@ -23,25 +26,25 @@ jobs:
       - name: Download Nginx Docker Image Artifact (amd64)
         uses: actions/download-artifact@v2
         with:
-          name: capstone-vulnerable-nginx-amd64
+          name: capstone-vulnerable-nginx-${{ github.event.workflow_run.head_commit.id }}-amd64
           path: .
 
       - name: Download Nginx Docker Image Artifact (arm64)
         uses: actions/download-artifact@v2
         with:
-          name: capstone-vulnerable-nginx-arm64
+          name: capstone-vulnerable-nginx-${{ github.event.workflow_run.head_commit.id }}-arm64
           path: .
 
       - name: Download PHP83 Docker Image Artifact (amd64)
         uses: actions/download-artifact@v2
         with:
-          name: capstone-vulnerable-php83-amd64
+          name: capstone-vulnerable-php83-${{ github.event.workflow_run.head_commit.id }}-amd64
           path: .
 
       - name: Download PHP83 Docker Image Artifact (arm64)
         uses: actions/download-artifact@v2
         with:
-          name: capstone-vulnerable-php83-arm64
+          name: capstone-vulnerable-php83-${{ github.event.workflow_run.head_commit.id }}-arm64
           path: .
 
       - name: Log in to DockerHub
@@ -71,3 +74,6 @@ jobs:
           gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
           docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
           docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
+```
+
+This configuration ensures that the correct artifact files, including the commit SHA, are downloaded and pushed to DockerHub.
