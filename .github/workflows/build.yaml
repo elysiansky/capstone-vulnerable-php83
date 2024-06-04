@@ -65,8 +65,8 @@ jobs:
     uses: ./.github/workflows/publish.yaml
     secrets: inherit # pass all secrets
     with:
-      platforms: ${{ jobs.build.outputs.platforms }}
-      git_sha: ${{ jobs.build.outputs.git_sha }}
+      platforms: ${{ needs.build.outputs.platforms }}
+      git_sha: ${{ needs.build.outputs.git_sha }}
     # uses: ./.github/workflows/publish.yaml
     # with:
     #   PLATFORMS: ${{ needs.build.outputs.PLATFORMS }}
