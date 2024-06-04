@@ -1,0 +1,20 @@
+name: Notify Build Status
+
+on:
+  push:
+    branches:
+      - main
+  workflow_run:
+    workflows: ["Build Docker Images", "Publish Docker Images"]
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Add notification steps here
