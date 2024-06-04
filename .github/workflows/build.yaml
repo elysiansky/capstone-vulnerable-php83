@@ -55,8 +55,9 @@ jobs:
           output: type=docker
           push: false
           tags: capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
+
   publish:  # Reference publish.yml workflow
     runs-on: ubuntu-latest
     environment: development
     needs: build  # This job depends on the successful completion of "build"
-    uses: ./publish.yml
+    uses: ./publish.yml@v1
