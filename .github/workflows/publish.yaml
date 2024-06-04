@@ -16,62 +16,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Download Nginx Image Digest
+      - name: Download Nginx Docker Image Artifact (amd64)
         uses: actions/download-artifact@v2
         with:
-          name: nginx-image-digest
-          path: ./docker/nginx
+          name: capstone-vulnerable-nginx-amd64
+          path: .
 
-      - name: Download PHP83 Image Digest
+      - name: Download Nginx Docker Image Artifact (arm64)
         uses: actions/download-artifact@v2
         with:
-          name: php83-image-digest
-          path: ./docker/php83
+          name: capstone-vulnerable-nginx-arm64
+          path: .
+
+      - name: Download PHP83 Docker Image Artifact (amd64)
+        uses: actions/download-artifact@v2
+        with:
+          name: capstone-vulnerable-php83-amd64
+          path: .
+
+      - name: Download PHP83 Docker Image Artifact (arm64)
+        uses: actions/download-artifact@v2
+        with:
+          name: capstone-vulnerable-php83-arm64
+          path: .
 
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Push Docker Images (Nginx)
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/nginx
-          file: ./docker/nginx/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:latest
-            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.sha }}
+      - name: Load and Push Docker Image (Nginx amd64)
+        run: |
+          gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
+          docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-amd64
 
-      - name: Push Docker Images (PHP83)
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/php83
-          file: ./docker/php83/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:latest
-            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.sha }}
+      - name: Load and Push Docker Image (Nginx arm64)
+        run: |
+          gunzip -c capstone-vulnerable-nginx_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
+          docker tag capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.head_commit.id }}-arm64
 
-      # - name: Checkout Helm Chart Repository
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: yourusername/helmchart-repo
-      #     token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
-      #     path: helmchart
+      - name: Load and Push Docker Image (PHP83 amd64)
+        run: |
+          gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-amd64.tar.gz | docker load
+          docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-amd64
 
-      # - name: Update Helm Chart Image Tag
-      #   run: |
-      #     sed -i 's/tag:.*/tag: ${{ github.sha }}/' helmchart/path/to/your/values.yaml
-
-      # - name: Commit and Push Changes
-      #   run: |
-      #     cd helmchart
-      #     git config --global user.email "you@example.com"
-      #     git config --global user.name "Your Name"
-      #     git add .
-      #     git commit -m "Update image tag to ${{ github.sha }}"
-      #     git push origin main
+      - name: Load and Push Docker Image (PHP83 arm64)
+        run: |
+          gunzip -c capstone-vulnerable-php83_${{ github.event.workflow_run.head_commit.id }}-arm64.tar.gz | docker load
+          docker tag capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64 ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64
+          docker push ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.head_commit.id }}-arm64

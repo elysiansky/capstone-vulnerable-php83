@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - development
 
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -34,36 +33,26 @@ jobs:
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build and Push Docker Images (Nginx)
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/nginx
-          file: ./docker/nginx/Dockerfile
-          platforms: ${{ matrix.platform }}
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
+      - name: Build Docker Image (Nginx)
+        id: build_nginx
+        run: |
+          docker buildx build --platform ${{ matrix.platform }} --output type=docker --tag capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} -f ./docker/nginx/Dockerfile ./docker/nginx
+          docker save capstone-vulnerable-nginx:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} | gzip > capstone-vulnerable-nginx_${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}.tar.gz
 
-      - name: Build and Push Docker Images (PHP83)
-        uses: docker/build-push-action@v2
-        with:
-          context: ./docker/php83
-          file: ./docker/php83/Dockerfile
-          platforms: ${{ matrix.platform }}
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
-
-      - name: Upload Nginx Image Digest
+      - name: Upload Nginx Docker Image Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: nginx-image-digest
-          path: |
-            ${{ github.workspace }}/docker/nginx/nginx-image-${{ matrix.platform }}.tar
+          name: capstone-vulnerable-nginx-${{ matrix.platform }}
+          path: capstone-vulnerable-nginx_${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}.tar.gz
 
-      - name: Upload PHP83 Image Digest
+      - name: Build Docker Image (PHP83)
+        id: build_php83
+        run: |
+          docker buildx build --platform ${{ matrix.platform }} --output type=docker --tag capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} -f ./docker/php83/Dockerfile ./docker/php83
+          docker save capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }} | gzip > capstone-vulnerable-php83_${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}.tar.gz
+
+      - name: Upload PHP83 Docker Image Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: php83-image-digest
-          path: |
-            ${{ github.workspace }}/docker/php83/php83-image-${{ matrix.platform }}.tar
+          name: capstone-vulnerable-php83-${{ matrix.platform }}
+          path: capstone-vulnerable-php83_${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}.tar.gz
