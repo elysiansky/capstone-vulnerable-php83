@@ -11,6 +11,10 @@ jobs:
   dummy:
     runs-on: ubuntu-latest
     needs: []  # No dependencies
+    steps:
+      - name: Empty Step  # Add this empty step
+        run: echo "Workaround placeholder to satisfy github action requirement"  # Or any other harmless command
+
   publish:
     runs-on: ubuntu-latest
     environment: development
