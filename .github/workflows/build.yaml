@@ -60,8 +60,13 @@ jobs:
           push: false
           tags: capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
 
-  publish:  # Reference publish.yml workflow
+  publish:  # Reference publish.yaml workflow
     runs-on: ubuntu-latest
     environment: development
     needs: build  # This job depends on the successful completion of "build"
-    uses: ./.github/workflows/publish.yml
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run Publish Workflow
+        uses: ./.github/workflows/publish.yaml
