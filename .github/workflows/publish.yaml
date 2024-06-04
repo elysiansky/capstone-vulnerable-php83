@@ -1,5 +1,18 @@
 name: Publish Docker Images
 
+on:
+  workflow_call:
+    inputs:
+      PLATFORMS:
+        required: true
+        type: string
+      GIT_SHA:
+        required: true
+        type: string
+    outputs:
+      PUBLISH_STATUS:
+        value: ${{ jobs.publish.outputs.PUBLISH_STATUS }}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -23,8 +36,8 @@ jobs:
         with:
           context: .
           file: ./docker/nginx/Dockerfile
-          platforms: ${{ needs.build.outputs.PLATFORMS }}  # Get platforms from build job output
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-nginx:${{ needs.build.outputs.GIT_SHA }}-${{ needs.build.outputs.PLATFORMS }}
+          platforms: ${{ inputs.PLATFORMS }}  # Get platforms from build job output
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-nginx:${{ inputs.GIT_SHA }}-${{ inputs.PLATFORMS }}
           push: true  # Enable push for this job
 
       - name: Publish Docker Image (PHP83)
@@ -32,6 +45,6 @@ jobs:
         with:
           context: .
           file: ./docker/php83/Dockerfile
-          platforms: ${{ needs.build.outputs.PLATFORMS }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ needs.build.outputs.SHA }}-${{ needs.build.outputs.PLATFORMS }}
+          platforms: ${{ inputs.PLATFORMS }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ inputs.GIT_SHA }}-${{ inputs.PLATFORMS }}
           push: true  # Enable push for this job

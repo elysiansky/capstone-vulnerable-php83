@@ -60,13 +60,11 @@ jobs:
           push: false
           tags: capstone-vulnerable-php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
 
-  publish:  # Reference publish.yaml workflow
-    runs-on: ubuntu-latest
-    environment: development
-    needs: build  # This job depends on the successful completion of "build"
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Run Publish Workflow
-        uses: ./.github/workflows/publish.yaml
+  publish: # Reference publish.yaml workflow
+    name: Publish Docker Images
+    needs: [build] # This job depends on the successful completion of "build"
+    uses: ./.github/workflows/publish.yaml
+    with:
+      PLATFORMS: ${{ needs.build.outputs.ENVIRONMENT }}
+      GIT_SHA: ${{ needs.set-env-vars.outputs.ECR_REPO_NAME }}
+    secrets: inherit
