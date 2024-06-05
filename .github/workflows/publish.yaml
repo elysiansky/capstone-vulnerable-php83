@@ -66,14 +66,14 @@ jobs:
           repository: elysiansky/capstone-chart-vulnerable-php83
           ref: main # Or use the branch/tag you want to update
           token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
+          path: ./capstone-chart-vulnerable-php83
 
       # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
       - name: Update Helm Chart Values Image Tag
-        run: |
-          ls -lah
+        run: |          
           IMAGE_TAG=$(cat capstone-chart-vulnerable-php83/values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
           sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" capstone-chart-vulnerable-php83/values.yaml
-        working-directory: capstone-vulnerable-php83
+        working-directory: /capstone-vulnerable-php83
 
 
       # Commit and push the changes to the Helm chart repository
