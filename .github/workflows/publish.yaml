@@ -62,11 +62,6 @@ jobs:
     steps:
       - name: Debug Outputs
         run: |
-          echo "Event: ${{ toJson(github.event) }}"
-          echo "Needs: ${{ toJson(needs) }}"
-
-      - name: Debug Outputs
-        run: |
           echo "Platforms: ${{ needs.build.outputs.platforms }}"
           echo "Git SHA: ${{ needs.build.outputs.git_sha }}"
 
