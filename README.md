@@ -1,4 +1,4 @@
-# Capstone Docker Images CI/CD Workflow
+# Capstone Docker Image CI/CD Workflow
 
 This repository contains the GitHub Actions workflow configuration for building and publishing Docker images for the Capstone project.
 
