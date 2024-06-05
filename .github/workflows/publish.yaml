@@ -53,7 +53,8 @@ jobs:
 
   on-success-update-chart:
     runs-on: ubuntu-latest
-    environment: development    
+    environment: development
+    needs: on-success-push
     steps:
       - name: Debug Outputs
         run: |
@@ -68,10 +69,20 @@ jobs:
           token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}          
 
       # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
+      # - name: Update Helm Chart Values Image Tag
+      #   run: |          
+      #     IMAGE_TAG=$(cat values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
+      #     sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" values.yaml          
+      #   working-directory: ${{ github.workspace }}
+      
+      # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
+      # Combined pipeline: This approach uses a single pipeline with tr and sed to streamline the process.
+      # tr for cleanup: The tr command removes quotes and spaces from the values.yaml content before piping it to sed.
+      # Single sed command: The sed command searches for lines starting with "tag: " (including the space) and replaces everything after the colon with the provided Git SHA value.
+      # In-place modification: The -i flag ensures direct modification of the values.yaml file.
       - name: Update Helm Chart Values Image Tag
-        run: |          
-          IMAGE_TAG=$(cat values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
-          sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" values.yaml
+        run: |
+          tr -d ' " ' < values.yaml | sed -i "s/tag:.*/tag: ${{ inputs.git_sha }}/g" ${{ github.workspace }}/values.yaml
         working-directory: ${{ github.workspace }}
 
 
