@@ -48,6 +48,8 @@
 name: Publish Docker Images
 
 on:
+  workflow_call:
+
   workflow_run:
     workflows: ["build-docker-images"]
     types: [completed] #requested
