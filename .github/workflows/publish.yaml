@@ -49,6 +49,13 @@ name: Publish Docker Images
 
 on:
   workflow_call:
+    inputs:
+      platforms:
+        required: true
+        type: string
+      git_sha:
+        required: true
+        type: string
 
   workflow_run:
     workflows: ["build-docker-images"]
@@ -79,8 +86,8 @@ jobs:
         with:
           context: .
           file: ./docker/nginx/Dockerfile
-          platforms: ${{ github.event.workflow_run.outputs.platforms }}
-          tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ github.event.workflow_run.outputs.git_sha }}-${{ github.event.workflow_run.outputs.platforms }}
+          platforms: ${{ inputs.platforms }}
+          tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ inputs.git_sha }}-${{ inputs.platforms }}
           push: true
 
       - name: Publish Docker Image (PHP83)
@@ -88,8 +95,8 @@ jobs:
         with:
           context: .
           file: ./docker/php83/Dockerfile
-          platforms: ${{ github.event.workflow_run.outputs.platforms }}
-          tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.outputs.git_sha }}-${{ github.event.workflow_run.outputs.platforms }}
+          platforms: ${{ inputs.platforms }}
+          tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
           push: true
   on-failure-notify:
     runs-on: ubuntu-latest
