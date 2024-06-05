@@ -22,8 +22,7 @@ jobs:
       - name: Debug Outputs
         run: |
           echo "Platforms: ${{ inputs.platforms }}"
-          echo "Git SHA: ${{ inputs.git_sha }}"
-          echo "github event workflow_run conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Git SHA: ${{ inputs.git_sha }}"          
 
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -51,3 +50,36 @@ jobs:
           platforms: ${{ inputs.platforms }}
           tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
           push: true
+
+  on-success-update-chart:
+    runs-on: ubuntu-latest
+    environment: development    
+    steps:
+      - name: Debug Outputs
+        run: |
+          echo "Platforms: ${{ inputs.platforms }}"
+          echo "Git SHA: ${{ inputs.git_sha }}"          
+
+      - name: Checkout Helm Chart Repository
+        uses: actions/checkout@v2
+        with:
+          repository: elysiansky/capstone-chart-vulnerable-php83
+          ref: main # Or use the branch/tag you want to update
+          token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
+
+      # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
+      - name: Update Helm Chart Values Image Tag
+        run: |
+          ls -lah
+          IMAGE_TAG=`cat values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " '`        
+          sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" values.yaml
+        working-directory: capstone-chart-vulnerable-php83
+
+      # Commit and push the changes to the Helm chart repository
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add .
+          git commit -m "Update image tag with latest Git SHA"
+          git push
