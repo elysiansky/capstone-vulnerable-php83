@@ -73,7 +73,7 @@ jobs:
         run: |          
           IMAGE_TAG=$(cat capstone-chart-vulnerable-php83/values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
           sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" capstone-chart-vulnerable-php83/values.yaml
-        working-directory: /capstone-vulnerable-php83
+        working-directory: ./capstone-vulnerable-php83
 
 
       # Commit and push the changes to the Helm chart repository
