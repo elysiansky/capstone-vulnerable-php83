@@ -1,32 +1,53 @@
-# name: Publish Docker Images
+name: publish-docker-images
 
-# on:
-#   push:
-#     branches:
-#       - main
-#   workflow_run:
-#     workflows: ["Build Docker Images"]
-#     types:
-#       - completed
+on:
+  workflow_call:
+    inputs:
+      platforms:
+        required: true
+        type: string
+      git_sha:
+        required: true
+        type: string
 
-# env:
-#   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
-#   HELM_CHART_PERSONAL_ACCESS_TOKEN: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}
+  workflow_run:
+    workflows: ["build-docker-images"]
+    types: [completed] #requested
 
-# jobs:
-#   publish:
-#     runs-on: ubuntu-latest
+jobs:
+  on-success-push:
+    runs-on: ubuntu-latest
+    environment: development    
+    steps:
+      - name: Debug Outputs
+        run: |
+          echo "Platforms: ${{ inputs.platforms }}"
+          echo "Git SHA: ${{ inputs.git_sha }}"
+          echo "github event workflow_run conclusion: ${{ github.event.workflow_run.conclusion }}"
 
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v1
-#         with:
-#           username: ${{ secrets.DOCKER_USERNAME }}
-#           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-#       - name: Push Docker image to Docker Hub
-#         run: docker push ${{ secrets.DOCKER_USERNAME }}/php83:${{ steps.git_sha.outputs.SHA }}-${{ matrix.platform }}
+      - name: Publish Docker Image (Nginx)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/nginx/Dockerfile
+          platforms: ${{ inputs.platforms }}
+          tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-nginx:${{ inputs.git_sha }}-${{ inputs.platforms }}
+          push: true
+
+      - name: Publish Docker Image (PHP83)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/php83/Dockerfile
+          platforms: ${{ inputs.platforms }}
+          tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
+          push: true
