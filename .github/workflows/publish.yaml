@@ -45,7 +45,7 @@
 #           tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
 #           push: true  # Enable push for this job
 
-name: Publish Docker Images
+name: publish-docker-images
 
 on:
   workflow_call:
@@ -69,8 +69,8 @@ jobs:
     steps:
       - name: Debug Outputs
         run: |
-          echo "Platforms: ${{ needs.build.outputs.platforms }}"
-          echo "Git SHA: ${{ needs.build.outputs.git_sha }}"
+          echo "Platforms: ${{ inputs.platforms }}"
+          echo "Git SHA: ${{ inputs.git_sha }}"
 
       - name: Checkout Repository
         uses: actions/checkout@v2
