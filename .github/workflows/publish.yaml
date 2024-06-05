@@ -71,7 +71,7 @@ jobs:
       # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
       - name: Update Helm Chart Values Image Tag
         run: |          
-          IMAGE_TAG=$(cat capstone-chart-vulnerable-php83/values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
+          IMAGE_TAG=$(cat values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
           sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" capstone-chart-vulnerable-php83/values.yaml
         working-directory: ./capstone-vulnerable-php83
 
