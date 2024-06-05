@@ -131,3 +131,8 @@ jobs:
           output: type=docker
           push: false
           tags: capstone-vulnerable-php83:${{ env.sha }}-${{ matrix.platform }}
+  
+  publish: # Reference publish.yaml workflow
+    needs: build # This job depends on the successful completion of "build"
+    uses: ./.github/workflows/publish.yaml
+    secrets: inherit # pass all secrets    

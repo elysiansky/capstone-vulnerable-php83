@@ -48,10 +48,6 @@
 name: Publish Docker Images
 
 on:
-  push:
-    branches:
-      - main
-      - development
   workflow_run:
     workflows: ["build-docker-images"]
     types: [completed] #requested
