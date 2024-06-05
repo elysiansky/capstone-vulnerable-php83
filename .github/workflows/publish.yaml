@@ -1,50 +1,3 @@
-# name: Publish Docker Images
-
-# on:
-#   workflow_call:
-#     inputs:
-#       git_sha:
-#         description: 'git hash commit'
-#         required: true
-#         type: string
-#       platform:
-#         description: 'Architecture builds arm64 or amd64(x86)'
-#         required: true
-#         type: string
-
-# jobs:
-#   docker-images:
-#     runs-on: ubuntu-latest
-#     environment: development
-
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2
-
-#       - name: Login to DockerHub
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ secrets.DOCKER_USERNAME }}
-#           password: ${{ secrets.DOCKER_PASSWORD }}
-
-#       - name: Publish Docker Image (Nginx)
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: .
-#           file: ./docker/nginx/Dockerfile
-#           platforms: ${{ inputs.PLATFORMS }}  # Get platforms from build job output
-#           tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-nginx:${{ inputs.git_sha }}-${{ inputs.platforms }}
-#           push: true  # Enable push for this job
-
-#       - name: Publish Docker Image (PHP83)
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: .
-#           file: ./docker/php83/Dockerfile
-#           platforms: ${{ inputs.PLATFORMS }}
-#           tags: ${{ secrets.DOCKERHUB_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
-#           push: true  # Enable push for this job
-
 name: publish-docker-images
 
 on:
@@ -71,6 +24,7 @@ jobs:
         run: |
           echo "Platforms: ${{ inputs.platforms }}"
           echo "Git SHA: ${{ inputs.git_sha }}"
+          echo "github event workflow_run conclusion: ${{ github.event.workflow_run.conclusion }}"
 
       - name: Checkout Repository
         uses: actions/checkout@v2
