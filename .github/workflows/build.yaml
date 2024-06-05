@@ -88,7 +88,7 @@ jobs:
     environment: development
     strategy:
       matrix:
-        platform: [amd64, arm64]
+        platform: [amd64] #platform: [amd64, arm64]
 
     outputs:
       platforms: ${{ matrix.platform }}
