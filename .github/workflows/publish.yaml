@@ -49,15 +49,14 @@ name: Publish Docker Images
 
 on:
   workflow_run:
-    workflows: ["Build Docker Images"]
-    types:
-      - completed
+    workflows: ["build-docker-images"]
+    types: [completed] #requested
 
 jobs:
-  publish:
+  on-success-publish:
     runs-on: ubuntu-latest
     environment: development
-
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Debug Outputs
         run: |
@@ -95,3 +94,8 @@ jobs:
           platforms: ${{ github.event.workflow_run.outputs.platforms }}
           tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ github.event.workflow_run.outputs.git_sha }}-${{ github.event.workflow_run.outputs.platforms }}
           push: true
+  on-failure-notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: echo "Workflow was a failure"
