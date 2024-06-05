@@ -92,7 +92,7 @@ jobs:
 
     outputs:
       platforms: ${{ matrix.platform }}
-      git_sha: ${{ steps.git_sha.outputs.sha }}
+      git_sha: ${{ env.sha }}
 
     steps:
       - name: Checkout Repository
