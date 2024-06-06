@@ -1,32 +1,67 @@
-# name: Notify Build Status
+name: notify-pipeline-status
 
-# on:
-#   push:
-#     branches:
-#       - main
-#   workflow_run:
-#     workflows: ["Build Docker Images", "Publish Docker Images"]
-#     types:
-#       - completed
+on:
+    workflow_call:
+      inputs:
+        pipeline:
+            required: true
+            type: string
+        status_on_success_push: 
+            required: true
+            type: string
+        status_on_success_update_chart: 
+            required: true
+            type: string
+        error_message_push: 
+            required: true
+            type: string
+        error_output_push: 
+            required: true
+            type: string
+        error_message_update_chart: 
+            required: true
+            type: string
+        error_output_update_chart: 
+            required: true
+            type: string
 
-# jobs:
-#   notify:
-#     runs-on: ubuntu-latest
+    workflow_run:
+      workflows: ["publish-docker-images"]
+      types: [completed] #requested
 
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    environment: development
 
-#       - name: Send Discord notification on success
-#         if: ${{ github.event.workflow_run.conclusion == 'success' }}
-#         uses: Ilshidur/action-discord@master
-#         with:
-#           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-#           content: 'Build and Publish: Success'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+    
+    #   - name: Print status messages
+    #     run: |
+    #       echo "status_on_success_push: ${{ inputs.status_on_success_push }}"
+    #       echo "status_on_success_update_chart: ${{ inputs.status_on_success_update_chart }}"
+    #       echo "pipeline: ${{ inputs.pipeline }}"
+    #       echo "error_message_push: ${{ inputs.error_message_push }}"
+    #       echo "error_output_push: ${{ inputs.error_output_push }}"
+    #       echo "error_message_update_chart: ${{ inputs.error_message_update_chart }}"
+    #       echo "error_output_update_chart: ${{ inputs.error_output_update_chart }}"
+    #       echo "error_output_update_chart: ${{ vars.PROJECT_IMAGE_REPOSITORY_URL }}"
+    #       echo "error_output_update_chart: ${{ vars.PROJECT_REPOSITORY_URL }}"
+    #       echo "error_output_update_chart: ${{ vars.PROJECT_CHART_URL }}"
+      
+      - name: Send Discord notification on success
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "**[ STATUS MESSAGE ] The project ${{ inputs.pipeline }} successfully built and published!** \n\n Project Image Repository URL: ${{ vars.PROJECT_IMAGE_REPOSITORY_URL }} \n Project Repository URL: ${{ vars.PROJECT_REPOSITORY_URL }} \n Project Chart URL: ${{ vars.PROJECT_CHART_URL }}"
 
-#       - name: Send Discord notification on failure
-#         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-#         uses: Ilshidur/action-discord@master
-#         with:
-#           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-#           content: 'Build and Publish: Failure'
+      - name: Send Discord notification on failure
+        if: ${{ inputs.status_on_success_push == 'failure' || inputs.status_on_success_update_chart == 'failure' }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "The project ${{ inputs.pipeline }} failed to build and publish: ${{ inputs.error_message_push }} ${{ inputs.error_output_push }} ${{ inputs.error_message_update_chart }} ${{ inputs.error_output_update_chart }}"
