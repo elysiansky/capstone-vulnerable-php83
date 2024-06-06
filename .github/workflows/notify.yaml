@@ -32,12 +32,13 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
+    environment: development
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
     
-      - name: Update Helm Chart Values Image Tag
+      - name: Print status messages
         run: |
           echo "${{ inputs.status_on_success_push }}"
           echo "${{ inputs.status_on_success_update_chart }}"
