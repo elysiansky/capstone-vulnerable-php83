@@ -38,22 +38,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
     
-      - name: Print status messages
-        run: |
-          echo "status_on_success_push: ${{ inputs.status_on_success_push }}"
-          echo "status_on_success_update_chart: ${{ inputs.status_on_success_update_chart }}"
-          echo "pipeline: ${{ inputs.pipeline }}"
-          echo "error_message_push: ${{ inputs.error_message_push }}"
-          echo "error_output_push: ${{ inputs.error_output_push }}"
-          echo "error_message_update_chart: ${{ inputs.error_message_update_chart }}"
-          echo "error_output_update_chart: ${{ inputs.error_output_update_chart }}"          
+    #   - name: Print status messages
+    #     run: |
+    #       echo "status_on_success_push: ${{ inputs.status_on_success_push }}"
+    #       echo "status_on_success_update_chart: ${{ inputs.status_on_success_update_chart }}"
+    #       echo "pipeline: ${{ inputs.pipeline }}"
+    #       echo "error_message_push: ${{ inputs.error_message_push }}"
+    #       echo "error_output_push: ${{ inputs.error_output_push }}"
+    #       echo "error_message_update_chart: ${{ inputs.error_message_update_chart }}"
+    #       echo "error_output_update_chart: ${{ inputs.error_output_update_chart }}"
+    #       echo "error_output_update_chart: ${{ vars.PROJECT_IMAGE_REPOSITORY_URL }}"
+    #       echo "error_output_update_chart: ${{ vars.PROJECT_REPOSITORY_URL }}"
+    #       echo "error_output_update_chart: ${{ vars.PROJECT_CHART_URL }}"
       
       - name: Send Discord notification on success
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: "The project ${{ inputs.pipeline }} successfully built and published! \n PROJECT_CHART_URL: ${{ vars.PROJECT_CHART_URL }} \n PROJECT_IMAGE_REPOSITORY_URL: ${{ vars.PROJECT_IMAGE_REPOSITORY_URL }} \n PROJECT_REPOSITORY_URL: ${{ vars.PROJECT_REPOSITORY_URL }}"
+          args: "The project ${{ inputs.pipeline }} successfully built and published! \n Project Image Repository URL: ${{ vars.PROJECT_IMAGE_REPOSITORY_URL }} \n Project Repository URL: ${{ vars.PROJECT_REPOSITORY_URL }} \n Project Chart URL: ${{ vars.PROJECT_CHART_URL }}"
 
       - name: Send Discord notification on failure
         if: ${{ inputs.status_on_success_push == 'failure' || inputs.status_on_success_update_chart == 'failure' }}
