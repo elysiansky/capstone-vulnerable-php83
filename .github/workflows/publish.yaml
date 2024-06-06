@@ -17,7 +17,8 @@ on:
 jobs:
   on-success-push:
     runs-on: ubuntu-latest
-    environment: development    
+    environment: development
+         
     steps:
       - name: Debug Outputs
         run: |
@@ -50,6 +51,9 @@ jobs:
           platforms: ${{ inputs.platforms }}
           tags:  ${{ secrets.DOCKER_USERNAME }}/capstone-vulnerable-php83:${{ inputs.git_sha }}-${{ inputs.platforms }}
           push: true
+    outputs:
+      error_message_push: ${{ steps.capture_error.outputs.ERROR_MESSAGE }}
+      error_output_push: ${{ steps.capture_error.outputs.ERROR_OUTPUT }}
 
   on-success-update-chart:
     runs-on: ubuntu-latest
@@ -87,3 +91,19 @@ jobs:
           git add .
           git commit -m "Update image tag with latest Git SHA"
           git push
+    outputs:
+      error_message_update_chart: ${{ steps.capture_error.outputs.ERROR_MESSAGE }}
+      error_output_update_chart: ${{ steps.capture_error.outputs.ERROR_OUTPUT }}
+
+  on-success-notify-discord: # Reference publish.yaml workflow
+    needs: on-success-update-chart # This job depends on the successful completion of "on-success-update-chart"
+    uses: ./.github/workflows/notify.yaml
+    secrets: inherit # pass all secrets
+    with:
+      pipeline: "Capstone Vulnerable php83"
+      status_on_success_push: ${{ needs.on-success-push.result }}
+      status_on_success_update_chart: ${{ needs.on-success-update-chart.result }}
+      error_message_push: ${{ needs.on-success-push.outputs.error_message_push }}
+      error_output_push: ${{ needs.on-success-push.outputs.error_output_push }}
+      error_message_update_chart: ${{ needs.on-success-update-chart.outputs.error_message_update_chart }}
+      error_output_update_chart: ${{ needs.on-success-update-chart.outputs.error_output_update_chart }}
