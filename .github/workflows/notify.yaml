@@ -48,7 +48,7 @@ jobs:
           echo "${{ inputs.error_output_update_chart }}"
 
       - name: Send Discord notification on success
-        if: ${{ inputs.status_on_success_push == 'success' && inputs.status_on_success_update_chart == 'success' }}
+        if: ${{ inputs.status_on_success_update_chart == 'success' }}
         uses: Ilshidur/action-discord@master
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
