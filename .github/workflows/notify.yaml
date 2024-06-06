@@ -36,6 +36,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+    
+      - name: Update Helm Chart Values Image Tag
+        run: |
+          echo "${{ inputs.status_on_success_push }}"
+          echo "${{ inputs.status_on_success_update_chart }}"
+          echo "${{ inputs.pipeline }}"
+          echo "${{ inputs.error_message_push }}"
+          echo "${{ inputs.error_output_push }}"
+          echo "${{ inputs.error_message_update_chart }}"
+          echo "${{ inputs.error_output_update_chart }}"
 
       - name: Send Discord notification on success
         if: ${{ inputs.status_on_success_push == 'success' && inputs.status_on_success_update_chart == 'success' }}
