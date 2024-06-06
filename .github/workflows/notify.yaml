@@ -53,7 +53,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: "The project ${{ inputs.pipeline }} successfully built and published!"
+          args: "The project ${{ inputs.pipeline }} successfully built and published! \n PROJECT_CHART_URL: ${{ vars.PROJECT_CHART_URL }} \n PROJECT_IMAGE_REPOSITORY_URL: ${{ vars.PROJECT_IMAGE_REPOSITORY_URL }} \n PROJECT_REPOSITORY_URL: ${{ vars.PROJECT_REPOSITORY_URL }}"
 
       - name: Send Discord notification on failure
         if: ${{ inputs.status_on_success_push == 'failure' || inputs.status_on_success_update_chart == 'failure' }}
