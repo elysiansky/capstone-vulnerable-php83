@@ -48,6 +48,13 @@ jobs:
           echo "error_message_update_chart ${{ inputs.error_message_update_chart }}"
           echo "error_output_update_chart ${{ inputs.error_output_update_chart }}"
           echo "DISCORD_WEBHOOK ${{ secrets.DISCORD_WEBHOOK }}"
+      
+      - name: Send Discord notification on success v2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "The project ${{ inputs.pipeline }} successfully built and published."
 
       - name: Send Discord notification on success
         if: ${{ inputs.status_on_success_update_chart == 'success' }}
