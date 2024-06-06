@@ -66,14 +66,7 @@ jobs:
         with:
           repository: elysiansky/capstone-chart-vulnerable-php83
           ref: main # Or use the branch/tag you want to update
-          token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}          
-
-      # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
-      # - name: Update Helm Chart Values Image Tag
-      #   run: |          
-      #     IMAGE_TAG=$(cat values.yaml | grep tag: | cut -d ":" -f 2 | tr -d ' " ')
-      #     sed -i "s/$IMAGE_TAG/${{ inputs.git_sha }}/g" values.yaml          
-      #   working-directory: ${{ github.workspace }}
+          token: ${{ secrets.HELM_CHART_PERSONAL_ACCESS_TOKEN }}      
       
       # Update the Helm chart's values.yaml tag: VALUE with the latest Git SHA VALUE
       # Combined pipeline: This approach uses a single pipeline with tr and sed to streamline the process.
@@ -82,7 +75,7 @@ jobs:
       # In-place modification: The -i flag ensures direct modification of the values.yaml file.
       - name: Update Helm Chart Values Image Tag
         run: |
-          tr -d ' " ' < values.yaml | sed -i "s/tag:.*/tag: ${{ inputs.git_sha }}/g" ${{ github.workspace }}/values.yaml
+          tr -d ' " ' < values.yaml | sed -i "s/tag:.*/tag: ${{ inputs.git_sha }}-${{ inputs.platforms }}/g" ${{ github.workspace }}/values.yaml
         working-directory: ${{ github.workspace }}
 
 
