@@ -90,7 +90,7 @@ jobs:
           git add .
           git commit -m "Update image tag with latest Git SHA"
           git push
-    output:
+    outputs:
       error_message_update_chart: ${{ steps.capture_error.outputs.ERROR_MESSAGE }}
       error_output_update_chart: ${{ steps.capture_error.outputs.ERROR_OUTPUT }}
 
