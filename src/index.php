@@ -1,4 +1,4 @@
 <?php
-echo "hello world!"
+echo "hello world!";
 sleep(9999999999);
 phpinfo();
