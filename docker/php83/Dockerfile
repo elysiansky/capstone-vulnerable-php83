@@ -10,6 +10,9 @@ WORKDIR /var/www/html
 # Copy the application files
 COPY /src /var/www/html/
 
+# Copy the www.conf file to the PHP-FPM configuration directory
+COPY /docker/php83/www.conf /usr/local/etc/php-fpm.d/www.conf
+
 # Copy the entrypoint script
 COPY /docker/php83/entrypoint.sh /entrypoint.sh
 
