@@ -1,7 +1,7 @@
 <?php
 try {
     // Control variable
-    $showPhpInfo = true; // Set to false to display another message
+    $showPhpInfo = false; // Set to false to display another message
 
     // Function to keep the script running
     function keepAlive() {
