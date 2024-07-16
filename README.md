@@ -41,4 +41,4 @@ That's it! Now, every push to the `main` or `development` branch will trigger th
 
 For more information on how to configure and customize GitHub Actions workflows, refer to the [GitHub Actions documentation](https://docs.github.com/en/actions).
 
-Version updated: 1.01
+Version updated: 1.02
