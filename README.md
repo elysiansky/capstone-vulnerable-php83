@@ -40,3 +40,5 @@ To use this workflow in your project:
 That's it! Now, every push to the `main` or `development` branch will trigger the CI/CD workflow, building and publishing Docker images for your project.
 
 For more information on how to configure and customize GitHub Actions workflows, refer to the [GitHub Actions documentation](https://docs.github.com/en/actions).
+
+Version updated: 1.01
