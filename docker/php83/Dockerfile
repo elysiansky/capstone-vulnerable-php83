@@ -10,8 +10,14 @@ WORKDIR /var/www/html
 # Copy the application files
 COPY /src /var/www/html/
 
+# Copy the entrypoint script
+COPY /docker/php83/entrypoint.sh /entrypoint.sh
+
+# Make the entrypoint script executable
+RUN chmod +x /entrypoint.sh
+
 # Expose the port
 EXPOSE 9000
 
-# Start PHP-FPM
-CMD ["php-fpm"]
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]

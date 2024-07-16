@@ -2,9 +2,9 @@ services:
   php-fpm:
     build:
       context: .
-      dockerfile: docker/php83/Dockerfile
+      dockerfile: docker/php83/Dockerfile    
     volumes:
-      - ./src:/var/www/html
+      - ./src:/var/www/html    
     expose:
       - 9000
 
