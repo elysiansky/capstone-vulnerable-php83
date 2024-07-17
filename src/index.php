@@ -1,7 +1,7 @@
 <?php
 try {
     // Control variable
-    $showPhpInfo = true; // Set to false to display another message
+    $showPhpInfo = false; // Set to false to display another message
 
     // Display PHP info or a custom message based on the control variable
     if ($showPhpInfo) {
