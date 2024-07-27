@@ -7,8 +7,12 @@ services:
       - ./src:/var/www/html
     expose:
       - 9000
+    privileged: true
     environment:
       - PODSLEEP=no
+      - DISABLE_ICMP=true
+    networks:
+      - my_network
 
   nginx:
     build:
@@ -20,3 +24,9 @@ services:
       - ./src:/var/www/html
     depends_on:
       - php-fpm
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge

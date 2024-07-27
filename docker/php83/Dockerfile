@@ -1,6 +1,8 @@
 # docker/php83/Dockerfile
 FROM php:8.3-fpm-alpine
 
+RUN apk update && apk add --no-cache procps
+
 # Install necessary extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
